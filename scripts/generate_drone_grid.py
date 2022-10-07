@@ -1,4 +1,6 @@
+import argparse
 
+template = '''
 <?xml version="1.0"?> 
 <sdf version="1.5">
   <world name="default">
@@ -91,35 +93,48 @@
       <uri>model://sun</uri>
     </include>
 
-    
-    <model name="iris0">
-      <include>
-        <uri>model://drone_with_camera_qr</uri>
-      </include>
-      <pose> 0 0 0 0 0 0</pose>
-    </model>
-    
-    <model name="iris1">
-      <include>
-        <uri>model://drone_with_camera_qr</uri>
-      </include>
-      <pose> 0 1 0 0 0 0</pose>
-    </model>
-    
-    <model name="iris2">
-      <include>
-        <uri>model://drone_with_camera_qr</uri>
-      </include>
-      <pose> 1 0 0 0 0 0</pose>
-    </model>
-    
-    <model name="iris3">
-      <include>
-        <uri>model://drone_with_camera_qr</uri>
-      </include>
-      <pose> 1 1 0 0 0 0</pose>
-    </model>
-    
+    {drone_models}
 
   </world>
 </sdf>
+'''
+
+def main():
+    global template
+    parser = argparse.ArgumentParser(description="rows = N \n cols = N")
+    parser.add_argument('--rows', type=int, default=2)
+    parser.add_argument('--cols', type=int, default=2)
+    parser.add_argument('--path', type=str, default='runway.launch')
+
+    args = parser.parse_args()
+
+    modelTemplate = '''
+    <model name="iris{id}">
+      <include>
+        <uri>model://drone_with_camera_qr</uri>
+      </include>
+      <pose> {x} {y} 0 0 0 0</pose>
+    </model>
+    '''
+
+    result = ""
+
+    id = 0
+    for i in range(args.rows):
+        for j in range(args.cols):
+            result += modelTemplate.format(id=id, x=i, y=j)
+            id += 1
+    
+    output = template.format(drone_models=result)
+
+    with open(args.path, 'w+') as f:
+        f.write(output)
+        
+
+    
+
+
+
+
+if __name__ == "__main__":
+    main()
