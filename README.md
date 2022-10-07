@@ -19,3 +19,86 @@ For this process we will be utilizing a Kalman Filter to improve our estimates.
 
 The novelty of this project would be to utilize QR landmarks on neighboring drones to identify the relative camera pose with respect to the neighboring drones and fuse them using the Extended Kalman Filter (EKF) to improve the accuracy of localization and prevent drifts. 
 Using computer vision techniques we can obtain the relative measurement between two FLSs.
+
+# Steps to install the system
+
+1. Follow steps at [link](http://wiki.ros.org/noetic/Installation/Ubuntu) and install ROS
+
+2. Create the following folder structure 
+```bash
+mkdir -p ~/catkin_ws/src
+```
+3. Clone ardupilot repository into ~/catkin_ws/src
+```bash
+git clone https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+```
+4. Run following script to install prereqs
+```bash
+Tools/environment_install/install-prereqs-ubuntu.sh -y
+```
+5. Source .profile
+```bash
+source ~/.profile
+```
+6. Checkout latest ArduCopter build
+```bash
+git checkout Copter-4.2
+```
+7. Install submodules
+```bash
+git submodule update --init --recursive
+```
+8. Run ArduCopter SITL once to init values
+```bash
+cd ~/catkin_ws/src/ardupilot/ArduCopter
+sim_vehicle.py -w
+```
+9. Install ArduPilot plugin for Gazebo
+```bash
+cd ~/catkin_ws/src
+git clone https://github.com/khancyr/ardupilot_gazebo.git
+cd ardupilot_gazebo
+```
+10. Build and install plugin
+```bash
+mkdir build
+cd build
+cmake ..
+make -j4
+sudo make install
+```
+11. Add gazebo sourcing to .bashrc or .zshrc
+```bash
+echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc
+```
+12. Git clone the current repository and rename it
+```bash
+cd ~/catkin_ws/src
+git clone https://github.com/dheeraj-coding/Co-OpLocalization.git
+mv Co-OpLocalization coop_localization
+```
+14. Install catkin tools from this [link](https://catkin-tools.readthedocs.io/en/latest/installing.html)
+
+15. Add catkin_ws sourcing to .bashrc or .zshrc
+```bash
+echo 'source ~/catkin_ws/devel/setup.bash'
+source ~/.bashrc
+```
+
+16. Add model source paths
+```bash
+echo 'export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models' >> ~/.bashrc
+echo 'export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$HOME/catkin_ws/src/coop_localization/models' >> ~/.bashrc
+source ~/.bashrc
+```
+17. Run python script to generate drone models
+```bash
+cd ~/catkin_ws/src/coop_localization/scripts/
+chmod +x generate_drone_grid.py
+python3 generate_drone_grid.py --rows=2 --cols=2 --path={FULLPATH-TO-CATKIN_WS}/src/coop_localization/worlds/runway.world
+```
+18. roslaunch runway model to see drones in gazebo
+```bash
+roslaunch coop_localization runway.launch
+```
