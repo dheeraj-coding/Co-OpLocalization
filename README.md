@@ -102,3 +102,6 @@ python3 generate_drone_grid.py --rows=2 --cols=2 --path={FULLPATH-TO-CATKIN_WS}/
 ```bash
 roslaunch coop_localization runway.launch
 ```
+## Simulation Environment images that can generate any number of drones in a square grid.
+![alt text](assets/36drones.png)
+![alt text](assets/4drones.png)
