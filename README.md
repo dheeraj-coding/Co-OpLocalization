@@ -96,7 +96,7 @@ source ~/.bashrc
 ```bash
 cd ~/catkin_ws/src/coop_localization/scripts/
 chmod +x generate_drone_grid.py
-python3 generate_drone_grid.py --rows=2 --cols=2 --path={FULLPATH-TO-CATKIN_WS}/src/coop_localization/worlds/runway.world
+python3 generate_drone_grid.py --rows=2 --cols=2 --path={FULLPATH-TO-CATKIN_WS}/src/coop_localization/worlds/runway.world --modelpath={FULLPATH-TO-CATKIN_WS}/src/coop_localization/models/
 ```
 18. roslaunch runway model to see drones in gazebo
 ```bash
