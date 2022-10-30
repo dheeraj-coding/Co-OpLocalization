@@ -111,7 +111,7 @@ sdfTemplate = '''
     </include>
 
     <link name="cam_link">
-      <pose>0 0 -0.02 0 0 0 </pose>
+      <pose>0 0 -0.02 0 1.5707 0 </pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -129,7 +129,7 @@ sdfTemplate = '''
           </geometry>
         </collision> -->
       <visual name='cam_link'>
-    	<pose>0 0 0.15 0 1.5707 0</pose>
+    	<pose>0 0 0.15 0 0 0</pose>
     	<geometry>
     		<cylinder>
     			<radius>.005</radius>
@@ -137,18 +137,41 @@ sdfTemplate = '''
     		</cylinder>
     	</geometry>
       </visual>
-      <sensor name="cam" type="camera" >
+      <sensor name="cam" type="wideanglecamera" >
       <pose>0 0 0.15 0 0 0</pose>
       <camera>
-        <horizontal_fov>1.2</horizontal_fov>
+        <horizontal_fov>3.1415</horizontal_fov>
         <image>
           <width>640</width>
           <height>480</height>
         </image>
         <clip>
           <near>0.1</near>
-          <far>1000</far>
+          <far>100</far>
         </clip>
+        <!-- WideAngle specific paramters -->
+        <lens>
+      <!-- type element is mandatory -->
+      <type>custom</type>
+
+      <!-- manually defined mapping function r = c1*f*fun(theta/c2 + c3) -->
+      <!-- More information here: https://en.wikipedia.org/wiki/Fisheye_lens#Mapping_function -->
+      <custom_function>
+        <c1>1.05</c1>   <!-- linear scaling -->
+        <c2>4</c2>      <!-- angle scaling -->
+        <f>1.0</f>      <!-- one more scaling parameter -->
+        <fun>tan</fun>  <!-- one of sin,tan,id -->
+      </custom_function>
+
+      <!-- if it is set to `true` your horizontal FOV will ramain as defined -->
+      <!-- othervise it depends on lens type and custom function, if there is one -->
+      <scale_to_hfov>true</scale_to_hfov>
+      <!-- clip everything that is outside of this angle -->
+      <cutoff_angle>3.1415</cutoff_angle>
+      <!-- resolution of the cubemap texture, the highter it is - the sharper is your image -->
+      <env_texture_size>512</env_texture_size>
+    </lens>
+    <!-- End of wide angle specific parameters -->
       </camera>
       <always_on>1</always_on>
       <update_rate>30</update_rate>
