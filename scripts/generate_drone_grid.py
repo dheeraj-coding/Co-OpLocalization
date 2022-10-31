@@ -1,6 +1,9 @@
 import argparse
+import imghdr
 import os
 import qrcode
+import cv2
+import numpy as np
 import shutil
 
 template = '''
@@ -142,36 +145,32 @@ sdfTemplate = '''
       <camera>
         <horizontal_fov>3.1415</horizontal_fov>
         <image>
-          <width>640</width>
-          <height>480</height>
+          <width>1280</width>
+          <height>960</height>
         </image>
         <clip>
-          <near>0.1</near>
-          <far>100</far>
+          <near>0.15</near>
+          <far>1500</far>
         </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.0001</stddev>
+        </noise>
         <!-- WideAngle specific paramters -->
         <lens>
-      <!-- type element is mandatory -->
-      <type>custom</type>
-
-      <!-- manually defined mapping function r = c1*f*fun(theta/c2 + c3) -->
-      <!-- More information here: https://en.wikipedia.org/wiki/Fisheye_lens#Mapping_function -->
-      <custom_function>
-        <c1>1.05</c1>   <!-- linear scaling -->
-        <c2>4</c2>      <!-- angle scaling -->
-        <f>1.0</f>      <!-- one more scaling parameter -->
-        <fun>tan</fun>  <!-- one of sin,tan,id -->
-      </custom_function>
-
-      <!-- if it is set to `true` your horizontal FOV will ramain as defined -->
-      <!-- othervise it depends on lens type and custom function, if there is one -->
-      <scale_to_hfov>true</scale_to_hfov>
-      <!-- clip everything that is outside of this angle -->
-      <cutoff_angle>3.1415</cutoff_angle>
-      <!-- resolution of the cubemap texture, the highter it is - the sharper is your image -->
-      <env_texture_size>512</env_texture_size>
-    </lens>
-    <!-- End of wide angle specific parameters -->
+          <type>custom</type>
+          <custom_function>
+            <c1>1.0</c1>
+            <c2>1.95</c2>
+            <f>6</f>
+            <fun>tan</fun>
+          </custom_function>
+          <scale_to_hfov>true</scale_to_hfov>
+          <cutoff_angle>2.84488668</cutoff_angle>
+          <env_texture_size>512</env_texture_size>
+        </lens>
+        <!-- End of wide angle specific parameters -->
       </camera>
       <always_on>1</always_on>
       <update_rate>30</update_rate>
@@ -179,7 +178,7 @@ sdfTemplate = '''
       <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
         <always_on>true</always_on>
         <update_rate>30</update_rate>
-        <cameraName>webcam</cameraName>
+        <cameraName>{droneName}</cameraName>
         <imageTopicName>image_raw</imageTopicName>
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
         <frameName>camera_link</frameName>
@@ -484,11 +483,28 @@ def main():
             id += 1
             try:
               shutil.copytree(dronemodelPath, dronemodelPath+str(id))
-              img = qrcode.make(id)
-              img.save(os.path.join(dronemodelPath+str(id), 'meshes/testqr.png'))
+              # img = qrcode.make(id)
+              img = np.zeros((300, 300, 1), dtype='uint8')
+              arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
+              cv2.aruco.drawMarker(arucoDict, id, 300, img, 1)
+              borderSize = 10
+              border = cv2.copyMakeBorder(
+                img,
+                top=borderSize,
+                bottom=borderSize,
+                left=borderSize,
+                right=borderSize,
+                borderType = cv2.BORDER_CONSTANT,
+                value = [255, 255, 255]
+              )
+
+              # img.save(os.path.join(dronemodelPath+str(id), 'meshes/testqr.png'))
+              cv2.imshow("TAG", img)
+              cv2.waitKey(0)
+              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/testqr.png'), border)
               sdfPath = os.path.join(dronemodelPath+str(id), 'model.sdf')
               with open(sdfPath, 'w+') as f:
-                f.write(sdfTemplate.format(droneModel = 'drone_with_camera_qr'+str(id)))
+                f.write(sdfTemplate.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id)))
             except OSError as er:
               print(er)
               print("Error copying directory! Ensure model path is correct")
