@@ -10,10 +10,12 @@ import numpy as np
 import cv2
 
 bridge = CvBridge()
+MARKER_LENGTH = 0.18
 
 def callback(image, camera_info):
     # rospy.loginfo(rospy.get_caller_id()+"I heard %s", data.data)
     print("Received Image")
+    global MARKER_LENGTH
     try:
         cv2_img = bridge.imgmsg_to_cv2(image, "bgr8")
     except CvBridgeError as e:
@@ -31,7 +33,7 @@ def callback(image, camera_info):
         if corners:
             cam_mat = np.asarray(camera_info.K)
             cam_mat = cam_mat.reshape(3, 3)
-            rVec, tVec, _= cv2.aruco.estimatePoseSingleMarkers(corners, 20, cam_mat, camera_info.D)
+            rVec, tVec, _= cv2.aruco.estimatePoseSingleMarkers(corners, MARKER_LENGTH, cam_mat, camera_info.D)
             total_markers = range(0, ids.size)
             for id, corn, i in zip(ids, corners, total_markers):
                 cv2.polylines(cv2_img, [corn.astype(np.int32)], True, (0, 255, 255), 1, cv2.LINE_AA)
@@ -46,7 +48,7 @@ def callback(image, camera_info):
                 distance = np.sqrt(tVec[i][0][2]**2+tVec[i][0][0]**2+tVec[i][0][1]**2)
                 point = cv2.drawFrameAxes(cv2_img, cam_mat, camera_info.D, rVec[i], tVec[i], 1, 1)
                 cv2_img = cv2.putText(cv2_img, "id: {id} Dist: {dist: .2f}".format(id=id[0], dist=distance), tuple(top_right), cv2.FONT_HERSHEY_PLAIN, 1.3, (0, 0, 255), 2, cv2.LINE_AA)
-                cv2_img = cv2.putText(cv2_img, f"x:{round(tVec[i][0][0],1)} y: {round(tVec[i][0][1],1)} ", tuple(bottom_right), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 255), 2,cv2.LINE_AA)
+                cv2_img = cv2.putText(cv2_img, f"x:{round(tVec[i][0][0],1)} y: {round(tVec[i][0][1],1)} z: {round(tVec[i][0][2], 1)}", tuple(bottom_right), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 255), 2,cv2.LINE_AA)
 
         cv2.imshow('droneImg', cv2_img)
         cv2.waitKey(0)
