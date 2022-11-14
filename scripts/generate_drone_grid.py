@@ -697,8 +697,8 @@ sdfTemporary = '''
     </plugin>
     <plugin name="arducopter_plugin" filename="libArduPilotPlugin.so">
       <fdm_addr>127.0.0.1</fdm_addr>
-      <fdm_port_in>9002</fdm_port_in>
-      <fdm_port_out>9003</fdm_port_out>
+      <fdm_port_in>{inputPort}</fdm_port_in>
+      <fdm_port_out>{outputPort}</fdm_port_out>
       <!--
           Require by APM :
           Only change model and gazebo from XYZ to XY-Z coordinates
@@ -802,6 +802,8 @@ def main():
     result = ""
 
     id = 0
+    inPort = 9002
+    outPort = 9003
     for i in range(args.rows):
         for j in range(args.cols):
           if args.modelpath == '':
@@ -834,7 +836,9 @@ def main():
               sdfPath = os.path.join(dronemodelPath+str(id), 'model.sdf')
               with open(sdfPath, 'w+') as f:
                 # f.write(sdfTemplate.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id)))
-                f.write(sdfTemporary.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id)))
+                f.write(sdfTemporary.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id), inputPort=str(inPort), outputPort=str(outPort)))
+              inPort += 10
+              outPort += 10
                 # f.write(sdfTemporary)
             except OSError as er:
               print(er)
