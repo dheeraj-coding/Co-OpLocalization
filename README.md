@@ -105,3 +105,8 @@ roslaunch coop_localization runway.launch
 ## Simulation Environment images that can generate any number of drones in a square grid.
 ![alt text](assets/36drones.png)
 ![alt text](assets/4drones.png)
+
+19. to run multi drone with mavros communication install 
+```bash
+sudo apt-get install gnome-terminal
+```
