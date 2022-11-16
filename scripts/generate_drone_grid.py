@@ -490,8 +490,8 @@ sdfTemporary = '''
       <camera>
         <horizontal_fov>1.2</horizontal_fov>
         <image>
-          <width>640</width>
-          <height>480</height>
+          <width>1280</width>
+          <height>960</height>
         </image>
         <clip>
           <near>0.1</near>

@@ -58,8 +58,15 @@ def listener():
     rospy.init_node('listener', anonymous=True)
     # rospy.Subscriber('chatter', String, callback)
     # rospy.spin()
-    image_sub = message_filters.Subscriber('iris1/image_raw', Image)
-    info_sub = message_filters.Subscriber('iris1/camera_info', CameraInfo)
+
+    id = rospy.get_param("~id")
+    id = int(id)
+    print("ID= ", id)
+
+    image_sub = message_filters.Subscriber('iris{id}/image_raw'.format(id=id), Image)
+    info_sub = message_filters.Subscriber('iris{id}/camera_info'.format(id=id), CameraInfo)
+
+    
 
     ts = message_filters.TimeSynchronizer([image_sub, info_sub], 10)
     ts.registerCallback(callback)
