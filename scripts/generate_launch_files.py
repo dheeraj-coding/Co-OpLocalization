@@ -41,7 +41,7 @@ def main():
     height = 2
     for i in range(args.numdrones):
         result += template.format(id = str(i+1), height=str(height))
-        height *= 2
+        height += 2
     
     try:
         with open(droneLaunchFile, "w+") as f:
@@ -68,8 +68,8 @@ def main():
     
     arducopterScript = '''
     #!/bin/bash
-    konsole --hold'''
-    scriptTemplate = '--new-tab -e "sim_vehicle.py -v ArduCopter -f gazebo-drone{droneNum} -I{id}" '
+    '''
+    scriptTemplate = 'konsole --hold --new-tab -e $SHELL -c "sim_vehicle.py -v ArduCopter -f gazebo-drone{droneNum} -I{id}" &'
     result = ""
     port = 8100
     for i in range(args.numdrones):
