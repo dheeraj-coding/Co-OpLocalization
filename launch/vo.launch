@@ -1,0 +1,11 @@
+<launch> 
+<group>
+		<node pkg="coop_localization" type="visual_odom.py" name="vo1" output="screen" ns="/iris1">
+			<param name="namespace" value="/iris1"/>
+			<param name="use_sim_time"  value="true" />
+            <param name="image" value="/iris1/image_raw" />
+            <param name="info" value="/iris1/camera_info" />
+            <param name="pose" value="/mavros/local_position/pose" />
+		</node>
+</group>
+ </launch>

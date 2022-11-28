@@ -7,13 +7,4 @@
             <param name="height" value="2" />
 		</node>
 </group>
-
-<group>
-		<node pkg="coop_localization" type="square" name="square2" output="screen" ns="/iris2">
-			<param name="namespace" value="/iris2"/>
-			<param name="use_sim_time"  value="true" />
-            <param name="id" value="2" />
-            <param name="height" value="4" />
-		</node>
-</group>
- </launch>
+</launch>
