@@ -110,7 +110,14 @@
       <include>
         <uri>model://drone_with_camera_qr3</uri>
       </include>
-      <pose> 0.0 1.5 0 0 0 0</pose>
+      <pose> 0.75 0.0 0 0 0 0</pose>
+    </model>
+    
+    <model name="iris4">
+      <include>
+        <uri>model://drone_with_camera_qr4</uri>
+      </include>
+      <pose> 0.75 0.75 0 0 0 0</pose>
     </model>
     
 
