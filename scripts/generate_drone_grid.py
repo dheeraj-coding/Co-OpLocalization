@@ -449,7 +449,6 @@ sdfTemplate = '''
   </model>
 </sdf>
 '''
-
 sdfTemporary = '''
 <?xml version='1.0'?>
 <sdf version="1.6" >
@@ -490,8 +489,8 @@ sdfTemporary = '''
       <camera>
         <horizontal_fov>1.2</horizontal_fov>
         <image>
-          <width>1280</width>
-          <height>960</height>
+          <width>640</width>
+          <height>480</height>
         </image>
         <clip>
           <near>0.1</near>
@@ -515,7 +514,7 @@ sdfTemporary = '''
       <child>cam_link</child>
       <parent>iris::base_link</parent>
       <axis>
-        <xyz>0 0 0</xyz>
+        <xyz>0 0 1</xyz>
         <limit>
           <upper>0</upper>
           <lower>0</lower>
@@ -527,7 +526,7 @@ sdfTemporary = '''
       <child>box_link</child>
       <parent>iris::base_link</parent>
       <axis>
-        <xyz>0 0 0</xyz>
+        <xyz>0 0 5</xyz>
         <limit>
           <upper>0</upper>
           <lower>0</lower>
@@ -548,7 +547,7 @@ sdfTemporary = '''
       <pose>0 0 0 0 0 0</pose>
       <geometry>
         <mesh>
-          <uri>model://{droneModel}/meshes/qrbox.dae</uri>
+          <uri>model://{droneModel}/meshes/multiqrbox.dae</uri>
         </mesh>
       </geometry>
       <!-- <material>
@@ -774,7 +773,6 @@ sdfTemporary = '''
 
   </model>
 </sdf>
-
 '''
 
 
@@ -813,26 +811,27 @@ def main():
             id += 1
             try:
               shutil.copytree(dronemodelPath, dronemodelPath+str(id))
-              # img = qrcode.make(id)
-              img = np.zeros((300, 300, 1), dtype='uint8')
-              arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
-              cv2.aruco.drawMarker(arucoDict, id, 300, img, 1)
-              borderSize = 5
-              border = cv2.copyMakeBorder(
-                img,
-                top=borderSize,
-                bottom=borderSize,
-                left=borderSize,
-                right=borderSize,
-                borderType = cv2.BORDER_CONSTANT,
-                value = [255, 255, 255]
-              )
-              print(border.shape)
 
-              # img.save(os.path.join(dronemodelPath+str(id), 'meshes/testqr.png'))
-              # cv2.imshow("TAG", img)
-              # cv2.waitKey(0)
-              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/testqr.png'), border)
+              img_front = get_aruco(id*5)
+              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/front.png'), img_front)
+
+              img_right = get_aruco(id*5+1)
+              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theright.png'), img_right)
+
+
+              img_left = get_aruco(id*5+2)
+              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theleft.png'), img_left)
+
+
+              img_back = get_aruco(id*5+3)
+              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theback.png'), img_back)
+
+
+              img_top = get_aruco(id*5+4)
+              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/thetop.png'), img_top)
+
+
+              
               sdfPath = os.path.join(dronemodelPath+str(id), 'model.sdf')
               with open(sdfPath, 'w+') as f:
                 # f.write(sdfTemplate.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id)))
@@ -851,8 +850,21 @@ def main():
     with open(args.path, 'w+') as f:
         f.write(output)
         
-
-    
+def get_aruco(id):
+    img = np.zeros((300, 300, 1), dtype='uint8')
+    arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
+    cv2.aruco.drawMarker(arucoDict, id, 300, img, 1)
+    borderSize = 5
+    img = cv2.copyMakeBorder(
+      img,
+      top=borderSize,
+      bottom=borderSize,
+      left=borderSize,
+      right=borderSize,
+      borderType = cv2.BORDER_CONSTANT,
+      value = [255, 255, 255]
+    )
+    return img    
 
 
 
