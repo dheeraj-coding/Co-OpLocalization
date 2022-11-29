@@ -36,6 +36,8 @@
 <node pkg="tf" type="static_transform_publisher" name="iris4_left" args="0 0.06 0.35 0 1.5708 1.5708 iris4 iris4_left 100"/>
 <node pkg="tf" type="static_transform_publisher" name="iris4_back" args="-0.06 0 0.35 0 -1.5708 3.1415 iris4 iris4_back 100"/>
 
+<node pkg="tf" type="static_transform_publisher" name="odom_con" args="0 0 0 0 0 0 map odom 100"/>
+<node pkg="tf" type="static_transform_publisher" name="base_con" args="0 0 0 0 0 0 map base_link 100"/>
 
 
 </launch>

@@ -6,4 +6,9 @@
     <arg name="gui" value="$(arg gui)"/>
     <!-- more default parameters can be changed here -->
   </include>
+  <include file="$(find coop_localization)/launch/multi_mavros.launch"/>
+  <node pkg="coop_localization" type="tf_publisher.py" name="tf_publisher" output="screen">
+    <param name="num" value="4"/>
+  </node>
+  <include file="$(find coop_localization)/launch/transforms.launch" />
 </launch>
