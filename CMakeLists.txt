@@ -205,3 +205,7 @@ catkin_install_python(PROGRAMS
 # catkin_add_nosetests(test)
 add_executable(square src/square.cpp)
 target_link_libraries(square ${catkin_LIBRARIES})
+add_executable(pyramidbase src/pyramidbase.cpp)
+target_link_libraries(pyramidbase ${catkin_LIBRARIES})
+add_executable(pyramidtip src/pyramidtip.cpp)
+target_link_libraries(pyramidtip ${catkin_LIBRARIES})
