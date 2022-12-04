@@ -25,6 +25,11 @@ mavrosTemplate = '''
 		<rosparam command="load" file="$(find mavros)/launch/apm_pluginlists.yaml" />
 		<rosparam command="load" file="$(find mavros)/launch/apm_config.yaml" />
 </node>
+<group ns="/iris{id}">
+    <node pkg="coop_localization" type="positionService.py" name="position" output="screen" ns="/iris{id}">
+            <param name="id" value="{id}" />
+    </node>
+</group>
 '''
 
 def main():

@@ -18,8 +18,8 @@ class PositionService:
         odomSub = message_filters.Subscriber(myTopic, Odometry)
         self.cache = message_filters.Cache(odomSub, 500)
     
-        rospy.Service('position', PositionInfo, self.handlePositionRequest)
-        rospy.Service('stagnant', Stagnant, self.handleStagnantRequest)
+        rospy.Service('~position_info', PositionInfo, self.handlePositionRequest)
+        rospy.Service('~stagnant', Stagnant, self.handleStagnantRequest)
         rospy.spin()
 
     def handleStagnantRequest(self, status):
