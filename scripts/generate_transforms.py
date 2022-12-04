@@ -13,19 +13,20 @@ transformTemplate = '''
 
 def main():
     parser = argparse.ArgumentParser(description="rows = N \n cols = N")
-    parser.add_argument('--rows', type=int, default=2)
-    parser.add_argument('--cols', type=int, default=2)
+    parser.add_argument('--drones', type=int, default=2)
+    #parser.add_argument('--cols', type=int, default=2)
     parser.add_argument('--path', type=str, default='transforms.launch')
 
     args = parser.parse_args()
-
+    coords = [[0, 0], [0, 2], [2, 0], [2, 2], [1, 1]]
     result = ""
 
     id = 0
-    for i in range(args.rows):
-        for j in range(args.cols):
-            id += 1
-            result += transformTemplate.format(id=id, x=i*0.75, y=j*0.75)
+    #for i in range(args.rows):
+    #    for j in range(args.cols):
+    for i in range(args.drones):
+        id += 1
+        result += transformTemplate.format(id=id, x=coords[i][0]*0.75, y=coords[i][1]*0.75)
 
     
     output = "<launch>" + result + "</launch>"

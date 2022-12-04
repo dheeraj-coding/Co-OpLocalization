@@ -779,8 +779,8 @@ sdfTemporary = '''
 def main():
     global template
     parser = argparse.ArgumentParser(description="rows = N \n cols = N")
-    parser.add_argument('--rows', type=int, default=2)
-    parser.add_argument('--cols', type=int, default=2)
+    parser.add_argument('--drones', type=int, default=2)
+    #parser.add_argument('--cols', type=int, default=2)
     parser.add_argument('--path', type=str, default='runway.world')
     parser.add_argument('--modelpath', type=str, default='')
 
