@@ -802,47 +802,48 @@ def main():
     id = 0
     inPort = 9002
     outPort = 9003
-    for i in range(args.rows):
-        for j in range(args.cols):
-          if args.modelpath == '':
-            result += modelTemplate.format(id=id, x=i, y=j)
-            id += 1
-          else:
-            id += 1
-            try:
-              shutil.copytree(dronemodelPath, dronemodelPath+str(id))
+    #for i in range(args.rows):
+    coords = [[0, 0], [0, 2], [2, 0], [2, 2], [1, 1]]
+    for i in range(args.drones):
+      if args.modelpath == '':
+        result += modelTemplate.format(id=id, x=coords[i][0], y=coords[i][1])
+        id += 1
+      else:
+        id += 1
+        try:
+          shutil.copytree(dronemodelPath, dronemodelPath+str(id))
 
-              img_front = get_aruco(id*5)
-              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/front.png'), img_front)
+          img_front = get_aruco(id*5)
+          cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/front.png'), img_front)
 
-              img_right = get_aruco(id*5+1)
-              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theright.png'), img_right)
-
-
-              img_left = get_aruco(id*5+2)
-              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theleft.png'), img_left)
+          img_right = get_aruco(id*5+1)
+          cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theright.png'), img_right)
 
 
-              img_back = get_aruco(id*5+3)
-              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theback.png'), img_back)
+          img_left = get_aruco(id*5+2)
+          cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theleft.png'), img_left)
 
 
-              img_top = get_aruco(id*5+4)
-              cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/thetop.png'), img_top)
+          img_back = get_aruco(id*5+3)
+          cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/theback.png'), img_back)
 
 
-              
-              sdfPath = os.path.join(dronemodelPath+str(id), 'model.sdf')
-              with open(sdfPath, 'w+') as f:
-                # f.write(sdfTemplate.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id)))
-                f.write(sdfTemporary.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id), inputPort=str(inPort), outputPort=str(outPort)))
-              inPort += 10
-              outPort += 10
-                # f.write(sdfTemporary)
-            except OSError as er:
-              print(er)
-              print("Error copying directory! Ensure model path is correct")
-            result += modelTemplate.format(id=id, x=i*0.75, y=j*0.75, droneModel='drone_with_camera_qr'+str(id))
+          img_top = get_aruco(id*5+4)
+          cv2.imwrite(os.path.join(dronemodelPath+str(id), 'meshes/thetop.png'), img_top)
+
+
+          
+          sdfPath = os.path.join(dronemodelPath+str(id), 'model.sdf')
+          with open(sdfPath, 'w+') as f:
+            # f.write(sdfTemplate.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id)))
+            f.write(sdfTemporary.format(droneName = 'iris'+str(id), droneModel = 'drone_with_camera_qr'+str(id), inputPort=str(inPort), outputPort=str(outPort)))
+          inPort += 10
+          outPort += 10
+            # f.write(sdfTemporary)
+        except OSError as er:
+          print(er)
+          print("Error copying directory! Ensure model path is correct")
+        result += modelTemplate.format(id=id, x=i*0.75, y=j*0.75, droneModel='drone_with_camera_qr'+str(id))
 
     
     output = template.format(drone_models=result)
