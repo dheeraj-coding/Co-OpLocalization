@@ -843,7 +843,7 @@ def main():
         except OSError as er:
           print(er)
           print("Error copying directory! Ensure model path is correct")
-        result += modelTemplate.format(id=id, x=i*0.75, y=j*0.75, droneModel='drone_with_camera_qr'+str(id))
+        result += modelTemplate.format(id=id, x=coords[i][0]*0.75, y=coords[i][1]*0.75, droneModel='drone_with_camera_qr'+str(id))
 
     
     output = template.format(drone_models=result)
