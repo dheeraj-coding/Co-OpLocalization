@@ -4,11 +4,11 @@
 int main(int argc, char** argv)
 {
 	//initialize ros 
-	ros::init(argc, argv, "gnc_node");
-	ros::NodeHandle gnc_node;
+	ros::init(argc, argv, "gnc_nodeone");
+	ros::NodeHandle gnc_nodeone;
 	
 	//initialize control publisher/subscribers
-	init_publisher_subscriber(gnc_node);
+	init_publisher_subscriber(gnc_nodeone);
 
   	// wait for FCU connection
 	wait4connect();
