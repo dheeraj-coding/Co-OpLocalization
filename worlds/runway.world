@@ -124,7 +124,7 @@
       <include>
         <uri>model://drone_with_camera_qr5</uri>
       </include>
-      <pose> 0.375 0.375 0 0 0 0</pose>
+      <pose> 0.375 0.375 0.375 0 0 0</pose>
     </model>
     
 

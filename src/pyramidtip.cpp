@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     initialize_local_frame();
 
     //request takeoff
-    takeoff(3);
+    takeoff(5);
 
     //specify some waypoints
     std::vector<gnc_api_waypoint> waypointList;
