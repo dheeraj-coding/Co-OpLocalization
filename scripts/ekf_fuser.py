@@ -5,11 +5,13 @@ from sensor_msgs.msg import Image, CameraInfo
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PointStamped
 from cv_bridge import CvBridge, CvBridgeError
+from coop_localization.srv import PositionInfo
 import numpy as np
 import tf
 import cv2
 
 MARKER_LENGTH = 0.18
+POSITION_SERVICE = '/iris{id}/position/position_info'
 
 class EKFfusion:
     def __init__(self):
@@ -68,6 +70,16 @@ class EKFfusion:
             print("error transforming point %s"%e)
         return transformedPt
     
+    def obtainPositionFromService(self, id, tstamp):
+        srv = POSITION_SERVICE.format(id=id)
+        rospy.wait_for_service(srv)
+        try:
+            positionRequest = rospy.ServiceProxy(srv, PositionInfo)
+            resp = positionRequest(tstamp)
+            return resp
+        except rospy.ServiceException as e:
+            print("Service call to iris%d failed: %s" % (id, e))
+
     def processImage(self, img, camInfo):
         arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
         arucoParams = cv2.aruco.DetectorParameters_create()
@@ -83,7 +95,9 @@ class EKFfusion:
                 tVec = tVecList[i]
                 rVec = rVecList[i]
                 self.drawAxes(id, img, corner, tVec, rVec, camMat, camInfo.D)
-                print(self.transformToMapFrame(id, self.stamp, tVec))
+                # print(self.transformToMapFrame(id, self.stamp, tVec))
+                droneId = id // 5
+                print(self.obtainPositionFromService(droneId, camInfo.header.stamp))
                 continue
         return img
 
