@@ -12,7 +12,7 @@ transformTemplate = '''
 '''
 
 def main():
-    parser = argparse.ArgumentParser(description="rows = N \n cols = N")
+    parser = argparse.ArgumentParser(description="drones = N")
     parser.add_argument('--drones', type=int, default=2)
     #parser.add_argument('--cols', type=int, default=2)
     parser.add_argument('--path', type=str, default='transforms.launch')

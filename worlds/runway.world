@@ -120,6 +120,13 @@
       <pose> 0.75 0.75 0 0 0 0</pose>
     </model>
     
+    <model name="iris5">
+      <include>
+        <uri>model://drone_with_camera_qr5</uri>
+      </include>
+      <pose> 0.375 0.375 0 0 0 0</pose>
+    </model>
+    
 
   </world>
 </sdf>

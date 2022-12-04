@@ -18,7 +18,7 @@
 </group>
 
 <group>
-        <node pkg="coop_localization" type="pyramidbase" name="square2" output="screen" ns="/iris2">
+        <node pkg="coop_localization" type="pyramidbase" name="square2" output="screen" ns="/iris3">
             <param name="namespace" value="/iris3"/>
             <param name="use_sim_time"  value="true" />
             <param name="id" value="3" />
@@ -27,7 +27,7 @@
 </group>
 
 <group>
-        <node pkg="coop_localization" type="pyramidbase" name="square2" output="screen" ns="/iris2">
+        <node pkg="coop_localization" type="pyramidbase" name="square2" output="screen" ns="/iris4">
             <param name="namespace" value="/iris4"/>
             <param name="use_sim_time"  value="true" />
             <param name="id" value="4" />
@@ -36,7 +36,7 @@
 </group>
 
 <group>
-        <node pkg="coop_localization" type="pyramidtip" name="square2" output="screen" ns="/iris2">
+        <node pkg="coop_localization" type="pyramidtip" name="square2" output="screen" ns="/iris5">
             <param name="namespace" value="/iris5"/>
             <param name="use_sim_time"  value="true" />
             <param name="id" value="5" />
