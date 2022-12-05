@@ -30,6 +30,9 @@ mavrosTemplate = '''
         <param name="use_sim_time" value="true" />
         <param name="id" value="{id}" />
     </node>
+    <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris{id}">
+        <param name="id" value="{id}" />
+    </node>
 </group>
 '''
 

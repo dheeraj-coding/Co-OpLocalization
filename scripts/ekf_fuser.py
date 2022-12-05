@@ -200,15 +200,15 @@ class EKFfusion:
             cv2img = self.bridge.imgmsg_to_cv2(img, 'bgr8')
             odom.pose.pose = self.transformOdom(odom)
             corrector = Corrector(odom)
-            processed = self.processImage(cv2img, camInfo, corrector, drawAxes=True)
+            processed = self.processImage(cv2img, camInfo, corrector, drawAxes=False)
             pt = corrector.getPointStamped()
             pt.header.frame_id = 'map'
             pt.header.stamp = camInfo.header.stamp
             self.ptPublisher.publish(pt)
 
-            cv2.imshow('droneImg', processed)
-            cv2.waitKey(100)
-            cv2.destroyAllWindows()
+            # cv2.imshow('droneImg', processed)
+            # cv2.waitKey(100)
+            # cv2.destroyAllWindows()
         except CvBridgeError as e:
             print(e)
 
