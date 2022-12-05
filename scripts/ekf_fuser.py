@@ -41,7 +41,7 @@ class Corrector:
         Skj = term1 + term2
 
         gainkj = torch.mm(self.covk, Hkt)
-        gainkj = torch.mm(gainkj, torch.linalg.inv(Skj))
+        gainkj = torch.mm(gainkj, torch.linalg.pinv(Skj))
         return gainkj, Hk
 
     def correctPositionAndCovariance(self, odomj, estimatedDist):
@@ -69,6 +69,12 @@ class Corrector:
         I = torch.eye(shape[0], shape[1])
         multiplier = I-term2
         self.covk = torch.mm(multiplier, self.covk)
+    def getPointStamped(self):
+        pt = PointStamped()
+        pt.point.x = self.Xk[0]
+        pt.point.y = self.Xk[1]
+        pt.point.z = self.Xk[2]
+        return pt
 
 class EKFfusion:
     def __init__(self):
@@ -83,9 +89,12 @@ class EKFfusion:
 
         self.tfListener = tf.TransformListener()
 
-        ts = message_filters.ApproximateTimeSynchronizer([image_sub, cam_info, odom_sub], 10, 0.5)
+        ts = message_filters.ApproximateTimeSynchronizer([image_sub, cam_info, odom_sub], 5, 0.6)
         ts.registerCallback(self.handleSynchronizedCallback)
         self.stamp = None
+
+        self.ptPublisher = rospy.Publisher('/pointInfo', PointStamped, queue_size=20)
+
         rospy.spin()
     
     def getDroneID(self, id):
@@ -141,10 +150,15 @@ class EKFfusion:
     def transformOdom(self, odom):
         pose = PoseStamped()
         pose.pose = odom.pose.pose
-        pose.header.frame_id = 'iris{id}_odom'.format(self.id)
+        pose.header.frame_id = 'iris{id}_odom'.format(id=self.id)
         pose.header.stamp = self.stamp
-        transformedPose = self.tfListener.transformPose("map", pose)
-        return transformedPose.pose
+        transformedPose = None
+        try:
+            transformedPose = self.tfListener.transformPose("map", pose)
+            return transformedPose.pose
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
+            print("error transforming odom %s" % e)
+        return odom.pose.pose
     
     def obtainPositionFromService(self, id, tstamp):
         srv = POSITION_SERVICE.format(id=id)
@@ -174,9 +188,8 @@ class EKFfusion:
                     self.drawAxes(id, img, corner, tVec, rVec, camMat, camInfo.D)
                 # print(self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp))
                 resp = self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp)
-                if resp.stationary:
+                if resp and resp.stationary:
                     corrector.correctPositionAndCovariance(resp.pos, self.computeDist(tVec))
-
                 continue
         return img
 
@@ -185,9 +198,14 @@ class EKFfusion:
 
         try:
             cv2img = self.bridge.imgmsg_to_cv2(img, 'bgr8')
-            odom.pose = self.transformOdom(odom)
+            odom.pose.pose = self.transformOdom(odom)
             corrector = Corrector(odom)
             processed = self.processImage(cv2img, camInfo, corrector, drawAxes=True)
+            pt = corrector.getPointStamped()
+            pt.header.frame_id = 'map'
+            pt.header.stamp = camInfo.header.stamp
+            self.ptPublisher.publish(pt)
+
             cv2.imshow('droneImg', processed)
             cv2.waitKey(100)
             cv2.destroyAllWindows()
@@ -196,14 +214,14 @@ class EKFfusion:
 
 
 if __name__ == "__main__":
-    # fuser = EKFfusion()
-    odom = Odometry()
-    odom.pose.pose = Pose(Point(0, 0, 0), Quaternion(0, 0, 0, 1))
-    odom.pose.covariance = [0.0]*36
+    fuser = EKFfusion()
+    # odom = Odometry()
+    # odom.pose.pose = Pose(Point(0, 0, 0), Quaternion(0, 0, 0, 1))
+    # odom.pose.covariance = [0.0]*36
 
-    odom2 = Odometry()
-    odom2.pose.pose = Pose(Point(0, 0, 0), Quaternion(0, 0, 0, 1))
-    odom2.pose.covariance = [0.0]*36
+    # odom2 = Odometry()
+    # odom2.pose.pose = Pose(Point(0, 0, 0), Quaternion(0, 0, 0, 1))
+    # odom2.pose.covariance = [0.0]*36
 
-    corr = Corrector(odom)
-    corr.correctPositionAndCovariance(odom2, 2.3)
+    # corr = Corrector(odom)
+    # corr.correctPositionAndCovariance(odom2, 2.3)

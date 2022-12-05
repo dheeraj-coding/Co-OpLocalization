@@ -3,7 +3,7 @@ import rospy
 from coop_localization.srv import *
 import time
 
-POSITION_SERVICE = 'position'
+POSITION_SERVICE = '/iris1/position/position_info'
 STAGNANT_SERVICE = 'stagnant'
 
 def retrieve_pos(time):
@@ -26,6 +26,6 @@ def retrieve_stag():
         print("Stag Service call failed: %s"%e)
 
 if __name__ == "__main__":
-    retrieve_stag()
-    time.sleep(2)
+    # retrieve_stag()
+    # time.sleep(2)
     retrieve_pos(rospy.Time(0))

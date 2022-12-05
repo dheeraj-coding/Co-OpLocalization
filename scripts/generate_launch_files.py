@@ -27,7 +27,8 @@ mavrosTemplate = '''
 </node>
 <group ns="/iris{id}">
     <node pkg="coop_localization" type="positionService.py" name="position" output="screen" ns="/iris{id}">
-            <param name="id" value="{id}" />
+        <param name="use_sim_time" value="true" />
+        <param name="id" value="{id}" />
     </node>
 </group>
 '''
