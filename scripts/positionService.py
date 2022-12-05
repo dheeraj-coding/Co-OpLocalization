@@ -9,7 +9,7 @@ class PositionService:
     def __init__(self) -> None:
         rospy.init_node('positionNode', anonymous=True)
         
-        self.stagnant = False
+        self.stagnant = True
 
         id = rospy.get_param("~id")
         self.id = int(id)

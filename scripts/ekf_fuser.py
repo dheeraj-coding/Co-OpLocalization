@@ -3,7 +3,7 @@ import rospy
 import message_filters
 from sensor_msgs.msg import Image, CameraInfo
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PointStamped, Pose, Point, Quaternion
+from geometry_msgs.msg import PointStamped, Pose, Point, Quaternion, PoseStamped
 from cv_bridge import CvBridge, CvBridgeError
 from coop_localization.srv import PositionInfo
 import numpy as np
@@ -88,13 +88,24 @@ class EKFfusion:
         self.stamp = None
         rospy.spin()
     
+    def getDroneID(self, id):
+        return id // 5
+    
+    def getBoxID(self, id):
+        return id % 5
+    
+    def computeDist(self, tVec):
+        distance = np.sqrt(tVec[0][0]**2+tVec[0][1]**2+tVec[0][2]**2)
+        return distance
+
+    
     def drawAxes(self, id, img, corner, tVec, rVec, intrinsic, distortion):
         cv2.polylines(img, [corner.astype(np.int32)], True, (0, 255, 255), 1, cv2.LINE_AA)
         corner = corner.reshape(4, 2)
         corner = corner.astype(int)
         top_right = corner[0].ravel()
         bottom_right = corner[2].ravel()
-        distance = np.sqrt(tVec[0][0]**2+tVec[0][1]**2+tVec[0][2]**2)
+        distance = self.computeDist(tVec)
         _ = cv2.drawFrameAxes(img, intrinsic, distortion, rVec, tVec, 1, 1)
         img = cv2.putText(img, "id: {id} Dist: {dist: .2f}".format(id=id, dist=distance), tuple(top_right), cv2.FONT_HERSHEY_PLAIN, 1.3, (0, 0, 255), 2, cv2.LINE_AA)
         img = cv2.putText(img, f"x:{round(tVec[0][0], 1)} y:{round(tVec[0][1], 1)} z:{round(tVec[0][2], 1)}", tuple(bottom_right), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 255), 2, cv2.LINE_AA)
@@ -102,8 +113,8 @@ class EKFfusion:
         return img
     
     def transformToMapFrame(self, id, stamp, tVec):
-        droneId = id // 5
-        boxId = id % 5
+        droneId = self.getDroneID(id)
+        boxId = self.getBoxID(id)
         pt = PointStamped()
         pt.header.stamp = stamp
         if boxId == 0:
@@ -127,6 +138,14 @@ class EKFfusion:
             print("error transforming point %s"%e)
         return transformedPt
     
+    def transformOdom(self, odom):
+        pose = PoseStamped()
+        pose.pose = odom.pose.pose
+        pose.header.frame_id = 'iris{id}_odom'.format(self.id)
+        pose.header.stamp = self.stamp
+        transformedPose = self.tfListener.transformPose("map", pose)
+        return transformedPose.pose
+    
     def obtainPositionFromService(self, id, tstamp):
         srv = POSITION_SERVICE.format(id=id)
         rospy.wait_for_service(srv)
@@ -137,7 +156,7 @@ class EKFfusion:
         except rospy.ServiceException as e:
             print("Service call to iris%d failed: %s" % (id, e))
 
-    def processImage(self, img, camInfo):
+    def processImage(self, img, camInfo, corrector: Corrector, drawAxes=False):
         arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
         arucoParams = cv2.aruco.DetectorParameters_create()
         grayframe = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -151,10 +170,13 @@ class EKFfusion:
                 id = id[0]
                 tVec = tVecList[i]
                 rVec = rVecList[i]
-                self.drawAxes(id, img, corner, tVec, rVec, camMat, camInfo.D)
-                # print(self.transformToMapFrame(id, self.stamp, tVec))
-                droneId = id // 5
-                print(self.obtainPositionFromService(droneId, camInfo.header.stamp))
+                if drawAxes:
+                    self.drawAxes(id, img, corner, tVec, rVec, camMat, camInfo.D)
+                # print(self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp))
+                resp = self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp)
+                if resp.stationary:
+                    corrector.correctPositionAndCovariance(resp.pos, self.computeDist(tVec))
+
                 continue
         return img
 
@@ -163,7 +185,9 @@ class EKFfusion:
 
         try:
             cv2img = self.bridge.imgmsg_to_cv2(img, 'bgr8')
-            processed = self.processImage(cv2img, camInfo)
+            odom.pose = self.transformOdom(odom)
+            corrector = Corrector(odom)
+            processed = self.processImage(cv2img, camInfo, corrector, drawAxes=True)
             cv2.imshow('droneImg', processed)
             cv2.waitKey(100)
             cv2.destroyAllWindows()
