@@ -3,15 +3,72 @@ import rospy
 import message_filters
 from sensor_msgs.msg import Image, CameraInfo
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import PointStamped, Pose, Point, Quaternion
 from cv_bridge import CvBridge, CvBridgeError
 from coop_localization.srv import PositionInfo
 import numpy as np
 import tf
 import cv2
+import torch
+from torch.autograd.functional import jacobian
 
 MARKER_LENGTH = 0.18
 POSITION_SERVICE = '/iris{id}/position/position_info'
+
+def rmse(xk, xj):
+    return torch.sqrt(torch.mean((xk-xj)**2))
+
+class Corrector:
+    def __init__(self, odomk):
+        self.Xk = torch.tensor([odomk.pose.pose.position.x, odomk.pose.pose.position.y, odomk.pose.pose.position.z], dtype=torch.float64)
+        self.Xk = torch.reshape(self.Xk, (3, 1))
+
+        self.covk = torch.tensor(odomk.pose.covariance, dtype=torch.float64)
+        self.covk = torch.reshape(self.covk, (6, 6))
+        self.covk = self.covk[:3, :3]
+
+    def computeKalmanGainAndH(self, Xj, covj):
+        res = jacobian(rmse, (self.Xk, Xj))
+        Hk = torch.reshape(res[0], (1, 3))
+        Hkt = torch.transpose(Hk, 0, 1)
+        Hj = torch.reshape(res[1], (1, 3))
+        Hjt = torch.transpose(Hj, 0, 1)
+        
+        term1 = torch.mm(Hk, self.covk)
+        term1 = torch.mm(term1, Hkt)
+        term2 = torch.mm(Hj, covj)
+        term2 = torch.mm(term2, Hjt) 
+        Skj = term1 + term2
+
+        gainkj = torch.mm(self.covk, Hkt)
+        gainkj = torch.mm(gainkj, torch.linalg.inv(Skj))
+        return gainkj, Hk
+
+    def correctPositionAndCovariance(self, odomj, estimatedDist):
+        Xj = torch.tensor([odomj.pose.pose.position.x, odomj.pose.pose.position.y, odomj.pose.pose.position.z], dtype=torch.float64)
+        Xj = torch.reshape(Xj, (3, 1))
+        covj = torch.tensor(odomj.pose.covariance, dtype=torch.float64)
+        covj = torch.reshape(covj, (6, 6))
+        covj = covj[:3, :3]
+        estimatedDist = torch.tensor(estimatedDist, dtype=torch.float64)
+        estimatedDist = torch.reshape(estimatedDist, (1, 1))
+
+        gainkj, Hk = self.computeKalmanGainAndH(Xj, covj)
+        self.correctPosition(Xj, estimatedDist, gainkj)
+        self.correctCovariance(gainkj, Hk)
+    
+    def correctPosition(self, Xj, estimatedDist, gainkj):
+        zkj = rmse(self.Xk, Xj)
+        zkj = torch.reshape(zkj, (1, 1))
+        term2 = torch.mm(gainkj, estimatedDist - zkj)
+        self.Xk = self.Xk + term2
+    
+    def correctCovariance(self, gainkj, Hk):
+        term2 = torch.mm(gainkj, Hk)
+        shape = term2.size()
+        I = torch.eye(shape[0], shape[1])
+        multiplier = I-term2
+        self.covk = torch.mm(multiplier, self.covk)
 
 class EKFfusion:
     def __init__(self):
@@ -115,4 +172,14 @@ class EKFfusion:
 
 
 if __name__ == "__main__":
-    fuser = EKFfusion()
+    # fuser = EKFfusion()
+    odom = Odometry()
+    odom.pose.pose = Pose(Point(0, 0, 0), Quaternion(0, 0, 0, 1))
+    odom.pose.covariance = [0.0]*36
+
+    odom2 = Odometry()
+    odom2.pose.pose = Pose(Point(0, 0, 0), Quaternion(0, 0, 0, 1))
+    odom2.pose.covariance = [0.0]*36
+
+    corr = Corrector(odom)
+    corr.correctPositionAndCovariance(odom2, 2.3)
