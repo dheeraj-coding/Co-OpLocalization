@@ -1,0 +1,12 @@
+<launch>
+<group>
+<node pkg="coop_localization" type="launch_drone.py" name="controller" output="screen" ns="/iris4">
+    <param name="namespace" value="/iris4"/>
+    <param name="use_sim_time"  value="true" />
+    <param name="id" value="4" />
+    <param name="x" value="0" />
+    <param name="y" value="2" />
+    <param name="z" value="1" />
+</node>
+</group>
+</launch>
