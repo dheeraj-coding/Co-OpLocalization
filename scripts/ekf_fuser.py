@@ -93,7 +93,7 @@ class EKFfusion:
         ts.registerCallback(self.handleSynchronizedCallback)
         self.stamp = None
 
-        self.ptPublisher = rospy.Publisher('/pointInfo', PointStamped, queue_size=20)
+        self.ptPublisher = rospy.Publisher('~qrpoint', PointStamped, queue_size=20)
 
         rospy.spin()
     
