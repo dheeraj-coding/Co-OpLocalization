@@ -16,7 +16,7 @@ class PositionService:
 
         id = rospy.get_param("~id")
         self.id = int(id)
-        myTopic = '/iris{id}/mavros/local_position/odom'.format(id=id)
+        myTopic = '/iris{id}/converter/odom'.format(id=id)
 
         odomSub = message_filters.Subscriber(myTopic, Odometry)
         self.cache = message_filters.Cache(odomSub, 500)
@@ -37,7 +37,7 @@ class PositionService:
             pose.header.frame_id = 'iris{id}_odom'.format(id=self.id)
             pose.header.stamp = odom.header.stamp
             pose.pose = odom.pose.pose
-            pose = self.tfListener.transformPose("map", pose)
+            pose = self.tfListener.transformPose("world", pose)
             odom.pose.pose = pose.pose
         stationary = self.stagnant
         return PositionInfoResponse(odom, stationary)

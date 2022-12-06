@@ -1,6 +1,6 @@
 import argparse
 transformTemplate = '''
-<node pkg="tf" type="static_transform_publisher" name="iris{id}_odom" args="{x} {y} 0 0 0 0 map iris{id}_odom 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris{id}_odom" args="{x} {y} 0 0 0 0 world iris{id}_odom 100"/>
 <node pkg="tf" type="static_transform_publisher" name="iris{id}_top" args="0 0 0.41 0 0 0 iris{id} iris{id}_top 100"/>
 <node pkg="tf" type="static_transform_publisher" name="iris{id}_front" args="0.06 0 0.35 0 1.5708 0 iris{id} iris{id}_front 100"/>
 <node pkg="tf" type="static_transform_publisher" name="iris{id}_right" args="0 -0.06 0.35 0 1.5708 -1.5708 iris{id} iris{id}_right 100"/>

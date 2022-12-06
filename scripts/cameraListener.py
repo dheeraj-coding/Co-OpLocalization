@@ -75,7 +75,7 @@ def callback(image, camera_info):
                 pt.point.z = tVec[i][0][2]
 
                 try:
-                    resP = tfListener.transformPoint("map", pt)
+                    resP = tfListener.transformPoint("world", pt)
                     print("Drone is at:")
                     print(resP)
                 except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:

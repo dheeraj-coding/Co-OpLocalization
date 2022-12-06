@@ -33,6 +33,9 @@ mavrosTemplate = '''
     <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris{id}">
         <param name="id" value="{id}" />
     </node>
+    <node pkg="coop_localization" type="convert_coord.py" name="converter" output="screen" ns="/iris{id}">
+        <param name="id" value="{id}" />
+    </node>
 </group>
 '''
 

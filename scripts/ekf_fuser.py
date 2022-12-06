@@ -85,7 +85,7 @@ class EKFfusion:
         
         image_sub = message_filters.Subscriber('/iris{id}/image_raw'.format(id=id), Image)
         cam_info = message_filters.Subscriber('/iris{id}/camera_info'.format(id=id), CameraInfo)
-        odom_sub = message_filters.Subscriber('/iris{id}/mavros/local_position/odom'.format(id=id), Odometry)
+        odom_sub = message_filters.Subscriber('/iris{id}/converter/odom'.format(id=id), Odometry)
 
         self.tfListener = tf.TransformListener()
 
@@ -142,7 +142,7 @@ class EKFfusion:
         pt.point.z = tVec[0][2]
         transformedPt = None
         try:
-            transformedPt = self.tfListener.transformPoint("map", pt)
+            transformedPt = self.tfListener.transformPoint("world", pt)
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
             print("error transforming point %s"%e)
         return transformedPt
@@ -154,7 +154,7 @@ class EKFfusion:
         pose.header.stamp = self.stamp
         transformedPose = None
         try:
-            transformedPose = self.tfListener.transformPose("map", pose)
+            transformedPose = self.tfListener.transformPose("world", pose)
             return transformedPose.pose
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
             print("error transforming odom %s" % e)
@@ -191,8 +191,7 @@ class EKFfusion:
                 # print(self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp))
                 resp = self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp)
                 if resp and resp.stationary:
-                    tVec[0] = -tVec[0]
-                    tVec[1] = -tVec[1]
+                    tVec[0], tVec[1] = -tVec[1], -tVec[0]
                     corrector.correctPositionAndCovariance(resp.pos, self.computeDist(tVec))
                 continue
         return img
@@ -206,9 +205,9 @@ class EKFfusion:
             corrector = Corrector(odom)
             processed = self.processImage(cv2img, camInfo, corrector, drawAxes=False)
             pt = corrector.getPointStamped()
-            pt.header.frame_id = 'map'
+            pt.header.frame_id = 'world'
             pt.header.stamp = camInfo.header.stamp
-            print(pt)
+            # print(pt)
             self.ptPublisher.publish(pt)
 
             # cv2.imshow('droneImg', processed)

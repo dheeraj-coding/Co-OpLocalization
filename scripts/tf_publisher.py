@@ -17,7 +17,8 @@ class DroneTfPublisher:
         q_new = quaternion_multiply(q_rot, q_orig)
         br = tf.TransformBroadcaster()
         br.sendTransform((pose_msg.pose.position.x, pose_msg.pose.position.y, pose_msg.pose.position.z),
-                    (q_new[0], q_new[1], q_new[2], q_new[3]),
+                    # (q_new[0], q_new[1], q_new[2], q_new[3]),
+                    (pose_msg.pose.orientation.x, pose_msg.pose.orientation.y, pose_msg.pose.orientation.z, pose_msg.pose.orientation.w),
                     rospy.Time.now(),
                     self.drone_name,
                     self.drone_name+"_odom")
@@ -27,5 +28,5 @@ if __name__=="__main__":
     num_drones = rospy.get_param("~num")
     for i in range(num_drones):
         dpub = DroneTfPublisher(i+1)
-        rospy.Subscriber('/iris{id}/mavros/local_position/pose'.format(id=i+1), PoseStamped, dpub.handle_drone_pose)
+        rospy.Subscriber('/iris{id}/converter/pose'.format(id=i+1), PoseStamped, dpub.handle_drone_pose)
     rospy.spin()
