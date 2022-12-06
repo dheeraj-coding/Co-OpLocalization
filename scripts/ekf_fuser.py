@@ -71,9 +71,9 @@ class Corrector:
         self.covk = torch.mm(multiplier, self.covk)
     def getPointStamped(self):
         pt = PointStamped()
-        pt.point.x = self.Xk[0]
-        pt.point.y = self.Xk[1]
-        pt.point.z = self.Xk[2]
+        pt.point.x = self.Xk[0].item()
+        pt.point.y = self.Xk[1].item()
+        pt.point.z = self.Xk[2].item()
         return pt
 
 class EKFfusion:
@@ -184,11 +184,15 @@ class EKFfusion:
                 id = id[0]
                 tVec = tVecList[i]
                 rVec = rVecList[i]
+                if len(tVec) < 3:
+                    continue
                 if drawAxes:
                     self.drawAxes(id, img, corner, tVec, rVec, camMat, camInfo.D)
                 # print(self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp))
                 resp = self.obtainPositionFromService(self.getDroneID(id), camInfo.header.stamp)
                 if resp and resp.stationary:
+                    tVec[0] = -tVec[0]
+                    tVec[1] = -tVec[1]
                     corrector.correctPositionAndCovariance(resp.pos, self.computeDist(tVec))
                 continue
         return img
@@ -204,6 +208,7 @@ class EKFfusion:
             pt = corrector.getPointStamped()
             pt.header.frame_id = 'map'
             pt.header.stamp = camInfo.header.stamp
+            print(pt)
             self.ptPublisher.publish(pt)
 
             # cv2.imshow('droneImg', processed)
