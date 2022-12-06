@@ -38,16 +38,17 @@ def main():
     pt = PointStamped()
     pt.header.stamp = rospy.Time()
     pt.header.frame_id = 'world'
+    # pt.point.x = -y
+    # pt.point.y = x
+    # pt.point.z = z
+
     pt.point.x = x
     pt.point.y = y
     pt.point.z = z
 
-    # pt = tfListener.transformPoint('iris{id}_odom'.format(id=id), pt)
-
-    # print("Transformed pt")
-    # print(pt)
+    pt = tfListener.transformPoint('iris{id}_odom'.format(id=id), pt)
     
-    drone.set_destination(x=pt.point.x, y=-pt.point.y, z=pt.point.z, psi=0)
+    drone.set_destination(x=-pt.point.y, y=pt.point.x, z=pt.point.z, psi=0)
     while not drone.check_waypoint_reached():
         rate.sleep()
     
