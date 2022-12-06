@@ -11,6 +11,11 @@ transformTemplate = '''
 
 '''
 
+endTF = '''
+<node pkg="tf" type="static_transform_publisher" name="world_map" args="0.0 0.0 0 0 0 0 world map 100"/>
+<node pkg="tf" type="static_transform_publisher" name="world_odom" args="0.0 0.0 0 0 0 0 world odom 100"/>
+'''
+
 def main():
     parser = argparse.ArgumentParser(description="rows = N \n cols = N")
     parser.add_argument('--rows', type=int, default=2)
@@ -28,7 +33,7 @@ def main():
             result += transformTemplate.format(id=id, x=i*0.75, y=j*0.75)
 
     
-    output = "<launch>" + result + "</launch>"
+    output = "<launch>" + result + endTF + "</launch>"
 
     with open(args.path, 'w+') as f:
         f.write(output)
