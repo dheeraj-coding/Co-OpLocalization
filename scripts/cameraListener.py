@@ -7,13 +7,27 @@ from cv_bridge import CvBridge, CvBridgeError
 from pyzbar.pyzbar import decode
 import numpy as np
 import tf
-from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import PointStamped, Point
 
 import cv2
 
 bridge = CvBridge()
 MARKER_LENGTH = 0.18
 tfListener = None
+ptPublisher = None
+myid = None
+
+def transformWaiter(fromFrame, toFrame):
+    print("Wwaiting on ", fromFrame, "to ", toFrame)
+    global tfListener
+    tfListener.waitForTransform(fromFrame, toFrame, rospy.Time(), rospy.Duration(4.0))
+    while not rospy.is_shutdown():
+        try:
+            tfListener.waitForTransform(fromFrame, toFrame, rospy.Time().now(), rospy.Duration(4.0))
+            break
+        except e:
+            print("TF wait error: ")
+
 
 def callback(image, camera_info):
     # rospy.loginfo(rospy.get_caller_id()+"I heard %s", data.data)
@@ -58,7 +72,7 @@ def callback(image, camera_info):
                 drone_id = id // 5
                 box_id = id % 5
                 pt = PointStamped()
-                pt.header.stamp = rospy.Time(0)
+                pt.header.stamp = rospy.Time(0).now()
                 if box_id == 0:
                     pt.header.frame_id = "iris"+str(drone_id)+"_front"
                 elif box_id == 1:
@@ -69,15 +83,16 @@ def callback(image, camera_info):
                     pt.header.frame_id = "iris"+str(drone_id)+"_back"
                 elif box_id == 4:
                     pt.header.frame_id = "iris"+str(drone_id)+"_top"
-                print(pt.header.frame_id)
-                pt.point.x = tVec[i][0][0]
-                pt.point.y = tVec[i][0][1]
+
+                pt.point.x = tVec[i][0][1]
+                pt.point.y = tVec[i][0][0]  
                 pt.point.z = tVec[i][0][2]
 
                 try:
+                    transformWaiter(pt.header.frame_id, "world")
                     resP = tfListener.transformPoint("world", pt)
-                    print("Drone is at:")
-                    print(resP)
+                    # print(resP)
+                    ptPublisher.publish(resP)
                 except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
                     print("Transform error")
                     print(e)
@@ -85,12 +100,14 @@ def callback(image, camera_info):
 
 
 
-        cv2.imshow('droneImg', cv2_img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2.imshow('droneImg', cv2_img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
 def listener():
+    global ptPublisher
     global tfListener
+    global myid 
     rospy.init_node('listener', anonymous=True)
     # rospy.Subscriber('chatter', String, callback)
     # rospy.spin()
@@ -98,11 +115,14 @@ def listener():
     id = rospy.get_param("~id")
     id = int(id)
     print("ID= ", id)
+    myid = id
 
     tfListener = tf.TransformListener()
 
-    image_sub = message_filters.Subscriber('iris{id}/image_raw'.format(id=id), Image)
-    info_sub = message_filters.Subscriber('iris{id}/camera_info'.format(id=id), CameraInfo)
+    ptPublisher = rospy.Publisher('~pointInfo', PointStamped, queue_size=100)
+
+    image_sub = message_filters.Subscriber('/iris{id}/image_raw'.format(id=id), Image)
+    info_sub = message_filters.Subscriber('/iris{id}/camera_info'.format(id=id), CameraInfo)
 
 
     ts = message_filters.TimeSynchronizer([image_sub, info_sub], 10)
