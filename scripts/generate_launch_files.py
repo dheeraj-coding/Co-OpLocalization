@@ -30,7 +30,7 @@ mavrosTemplate = '''
         <param name="use_sim_time" value="true" />
         <param name="id" value="{id}" />
     </node>
-    <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris{id}">
+    <node pkg="coop_localization" type="cameraListener.py" name="camestimator" output="screen" ns="/iris{id}">
         <param name="id" value="{id}" />
     </node>
     <node pkg="coop_localization" type="convert_coord.py" name="converter" output="screen" ns="/iris{id}">
