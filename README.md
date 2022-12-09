@@ -108,5 +108,49 @@ roslaunch coop_localization runway.launch
 
 19. to run multi drone with mavros communication install 
 ```bash
-sudo apt-get install gnome-terminal
+sudo apt-get install konsole
+```
+20. generate necessary launch files like this:
+```bash
+python3 generate_launch_files.py --numdrones=<num> --outputpath=<PATHTOLAUNCHFOLDER>
+```
+21. generate transform publishers:
+```bash
+python3 generate_transforms.py --rows=2 --cols=3 --path=<PATHTOLAUNCHFOLDER>
+```
+22. launch simulation using:
+```bash
+roslaunch coop_localization runway.launch
+```
+23. start the drone nodes:
+```bash
+./ardulaunch.sh
+```
+24. enable MALink Communication:
+```bash
+roslaunch coop_localization multi_mavros.launch
+```
+25. launch static transforms:
+```bash
+roslaunch coop_localization transforms.launch
+```
+26. launch tf publisher
+```bash
+rosrun coop_localization tf_publisher.py _num:=<numofdrones>
+```
+27. to launch all drones simultaneously run:
+```bash
+roslaunch coop_localization multi_drone.launch
+```
+28. for octahedron shape:
+```bash
+./octahedron.sh
+```
+29. for prism shape:
+```bash
+./prism.sh
+```
+30. To observe localization information:
+```bash
+rostopic echo /iris<id>/camestimator/pointInfo
 ```
