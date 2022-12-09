@@ -15,7 +15,7 @@ class Collector:
     def eventLoop(self):
         rospy.init_node("data_collector", anonymous=True)
 
-        ptsub = rospy.Subscriber('/iris{id}/ekf/qrpoint'.format(id=self.id), PointStamped, self.ptCallback)
+        ptsub = rospy.Subscriber('/iris{id}/camestimator/pointInfo'.format(id=self.id), PointStamped, self.ptCallback)
         self.gtCoords = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 
         rospy.on_shutdown(self.onShutDown)

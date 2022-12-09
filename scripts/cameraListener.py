@@ -8,6 +8,7 @@ from pyzbar.pyzbar import decode
 import numpy as np
 import tf
 from geometry_msgs.msg import PointStamped, Point
+from coop_localization.srv import PositionInfo
 
 import cv2
 
@@ -16,6 +17,18 @@ MARKER_LENGTH = 0.18
 tfListener = None
 ptPublisher = None
 myid = None
+POSITION_SERVICE = '/iris{id}/position/position_info'
+
+def obtainPositionFromService(id, tstamp):
+        srv = POSITION_SERVICE.format(id=id)
+        rospy.wait_for_service(srv)
+        try:
+            positionRequest = rospy.ServiceProxy(srv, PositionInfo)
+            resp = positionRequest(tstamp)
+            return resp
+        except rospy.ServiceException as e:
+            print("Service call to iris%d failed: %s" % (id, e))
+
 
 def transformWaiter(fromFrame, toFrame):
     print("Wwaiting on ", fromFrame, "to ", toFrame)
@@ -25,7 +38,7 @@ def transformWaiter(fromFrame, toFrame):
         try:
             tfListener.waitForTransform(fromFrame, toFrame, rospy.Time().now(), rospy.Duration(4.0))
             break
-        except e:
+        except:
             print("TF wait error: ")
 
 
@@ -54,6 +67,7 @@ def callback(image, camera_info):
             rVec, tVec, _= cv2.aruco.estimatePoseSingleMarkers(corners, MARKER_LENGTH, cam_mat, camera_info.D)
             total_markers = range(0, ids.size)
             for id, corn, i in zip(ids, corners, total_markers):
+                
                 cv2.polylines(cv2_img, [corn.astype(np.int32)], True, (0, 255, 255), 1, cv2.LINE_AA)
                 corn = corn.reshape(4, 2)
                 corn = corn.astype(int)
@@ -92,10 +106,11 @@ def callback(image, camera_info):
                     transformWaiter(pt.header.frame_id, "world")
                     resP = tfListener.transformPoint("world", pt)
                     # print(resP)
+                    # posState = obtainPositionFromService(drone_id, camera_info.header.stamp)
+                    # if posState and posState.stationary:
                     ptPublisher.publish(resP)
-                except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
-                    print("Transform error")
-                    print(e)
+                except:
+                    print("Transform error*********************************************************************************")
                     continue
 
 
