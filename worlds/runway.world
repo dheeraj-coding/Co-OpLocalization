@@ -96,14 +96,28 @@
       <include>
         <uri>model://drone_with_camera_qr1</uri>
       </include>
-      <pose> 0 0 0 0 0 0</pose>
+      <pose> 0.0 0.0 0 0 0 0</pose>
     </model>
     
     <model name="iris2">
       <include>
         <uri>model://drone_with_camera_qr2</uri>
       </include>
-      <pose> 0 1 0 0 0 0</pose>
+      <pose> 0.0 0.75 0 0 0 0</pose>
+    </model>
+    
+    <model name="iris3">
+      <include>
+        <uri>model://drone_with_camera_qr3</uri>
+      </include>
+      <pose> 0.75 0.0 0 0 0 0</pose>
+    </model>
+    
+    <model name="iris4">
+      <include>
+        <uri>model://drone_with_camera_qr4</uri>
+      </include>
+      <pose> 0.75 0.75 0 0 0 0</pose>
     </model>
     
 

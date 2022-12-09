@@ -1,0 +1,44 @@
+<launch>
+
+<node pkg="tf" type="static_transform_publisher" name="iris1_odom" args="0.0 0.0 0 0 0 0 world iris1_odom 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris1_top" args="0 0 0.41 0 0 0 iris1 iris1_top 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris1_front" args="0.06 0 0.35 0 1.5708 0 iris1 iris1_front 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris1_right" args="0 -0.06 0.35 0 1.5708 -1.5708 iris1 iris1_right 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris1_left" args="0 0.06 0.35 0 1.5708 1.5708 iris1 iris1_left 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris1_back" args="-0.06 0 0.35 0 -1.5708 3.1415 iris1 iris1_back 100"/>
+
+
+
+
+<node pkg="tf" type="static_transform_publisher" name="iris2_odom" args="0.0 0.75 0 0 0 0 world iris2_odom 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris2_top" args="0 0 0.41 0 0 0 iris2 iris2_top 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris2_front" args="0.06 0 0.35 0 1.5708 0 iris2 iris2_front 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris2_right" args="0 -0.06 0.35 0 1.5708 -1.5708 iris2 iris2_right 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris2_left" args="0 0.06 0.35 0 1.5708 1.5708 iris2 iris2_left 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris2_back" args="-0.06 0 0.35 0 -1.5708 3.1415 iris2 iris2_back 100"/>
+
+
+
+
+<node pkg="tf" type="static_transform_publisher" name="iris3_odom" args="0.75 0.0 0 0 0 0 world iris3_odom 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris3_top" args="0 0 0.41 0 0 0 iris3 iris3_top 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris3_front" args="0.06 0 0.35 0 1.5708 0 iris3 iris3_front 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris3_right" args="0 -0.06 0.35 0 1.5708 -1.5708 iris3 iris3_right 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris3_left" args="0 0.06 0.35 0 1.5708 1.5708 iris3 iris3_left 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris3_back" args="-0.06 0 0.35 0 -1.5708 3.1415 iris3 iris3_back 100"/>
+
+
+
+
+<node pkg="tf" type="static_transform_publisher" name="iris4_odom" args="0.75 0.75 0 0 0 0 world iris4_odom 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris4_top" args="0 0 0.41 0 0 0 iris4 iris4_top 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris4_front" args="0.06 0 0.35 0 1.5708 0 iris4 iris4_front 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris4_right" args="0 -0.06 0.35 0 1.5708 -1.5708 iris4 iris4_right 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris4_left" args="0 0.06 0.35 0 1.5708 1.5708 iris4 iris4_left 100"/>
+<node pkg="tf" type="static_transform_publisher" name="iris4_back" args="-0.06 0 0.35 0 -1.5708 3.1415 iris4 iris4_back 100"/>
+
+<node pkg="tf" type="static_transform_publisher" name="world_map" args="0.0 0.0 0 0 0 0 world map 100"/>
+<node pkg="tf" type="static_transform_publisher" name="world_odom" args="0.0 0.0 0 0 0 0 world odom 100"/>
+
+
+</launch>

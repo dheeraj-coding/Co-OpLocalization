@@ -54,3 +54,4 @@ CATKIN_IGNORE
 Footer
 cmake-build-debug/
 
+data

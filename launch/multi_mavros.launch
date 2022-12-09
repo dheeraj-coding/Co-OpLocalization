@@ -10,6 +10,18 @@
 		<rosparam command="load" file="$(find mavros)/launch/apm_pluginlists.yaml" />
 		<rosparam command="load" file="$(find mavros)/launch/apm_config.yaml" />
 </node>
+<group ns="/iris1">
+    <node pkg="coop_localization" type="positionService.py" name="position" output="screen" ns="/iris1">
+        <param name="use_sim_time" value="true" />
+        <param name="id" value="1" />
+    </node>
+    <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris1">
+        <param name="id" value="1" />
+    </node>
+    <node pkg="coop_localization" type="convert_coord.py" name="converter" output="screen" ns="/iris1">
+        <param name="id" value="1" />
+    </node>
+</group>
 
 <node pkg="mavros" type="mavros_node" name="mavros" required="false" clear_params="true" output="screen" respawn="true" ns="/iris2">
 		<param name="fcu_url" value="udp://127.0.0.1:14561@14565" />
@@ -22,4 +34,64 @@
 		<rosparam command="load" file="$(find mavros)/launch/apm_pluginlists.yaml" />
 		<rosparam command="load" file="$(find mavros)/launch/apm_config.yaml" />
 </node>
+<group ns="/iris2">
+    <node pkg="coop_localization" type="positionService.py" name="position" output="screen" ns="/iris2">
+        <param name="use_sim_time" value="true" />
+        <param name="id" value="2" />
+    </node>
+    <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris2">
+        <param name="id" value="2" />
+    </node>
+    <node pkg="coop_localization" type="convert_coord.py" name="converter" output="screen" ns="/iris2">
+        <param name="id" value="2" />
+    </node>
+</group>
+
+<node pkg="mavros" type="mavros_node" name="mavros" required="false" clear_params="true" output="screen" respawn="true" ns="/iris3">
+		<param name="fcu_url" value="udp://127.0.0.1:14571@14575" />
+		<param name="gcs_url" value="" />
+		<param name="target_system_id" value="3" />
+		<param name="target_component_id" value="1" />
+		<param name="fcu_protocol" value="v2.0" />
+
+		<!-- load blacklist, config -->
+		<rosparam command="load" file="$(find mavros)/launch/apm_pluginlists.yaml" />
+		<rosparam command="load" file="$(find mavros)/launch/apm_config.yaml" />
+</node>
+<group ns="/iris3">
+    <node pkg="coop_localization" type="positionService.py" name="position" output="screen" ns="/iris3">
+        <param name="use_sim_time" value="true" />
+        <param name="id" value="3" />
+    </node>
+    <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris3">
+        <param name="id" value="3" />
+    </node>
+    <node pkg="coop_localization" type="convert_coord.py" name="converter" output="screen" ns="/iris3">
+        <param name="id" value="3" />
+    </node>
+</group>
+
+<node pkg="mavros" type="mavros_node" name="mavros" required="false" clear_params="true" output="screen" respawn="true" ns="/iris4">
+		<param name="fcu_url" value="udp://127.0.0.1:14581@14585" />
+		<param name="gcs_url" value="" />
+		<param name="target_system_id" value="4" />
+		<param name="target_component_id" value="1" />
+		<param name="fcu_protocol" value="v2.0" />
+
+		<!-- load blacklist, config -->
+		<rosparam command="load" file="$(find mavros)/launch/apm_pluginlists.yaml" />
+		<rosparam command="load" file="$(find mavros)/launch/apm_config.yaml" />
+</node>
+<group ns="/iris4">
+    <node pkg="coop_localization" type="positionService.py" name="position" output="screen" ns="/iris4">
+        <param name="use_sim_time" value="true" />
+        <param name="id" value="4" />
+    </node>
+    <node pkg="coop_localization" type="ekf_fuser.py" name="ekf" output="screen" ns="/iris4">
+        <param name="id" value="4" />
+    </node>
+    <node pkg="coop_localization" type="convert_coord.py" name="converter" output="screen" ns="/iris4">
+        <param name="id" value="4" />
+    </node>
+</group>
  </launch>

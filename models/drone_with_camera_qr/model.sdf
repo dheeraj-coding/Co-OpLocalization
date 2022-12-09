@@ -95,7 +95,7 @@
       <pose>0 0 0 0 0 0</pose>
       <geometry>
         <mesh>
-          <uri>model://drone_with_camera_qr/meshes/qrbox.dae</uri>
+          <uri>model://drone_with_camera_qr/meshes/multiqrbox.dae</uri>
         </mesh>
       </geometry>
       <!-- <material>
